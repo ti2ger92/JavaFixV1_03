@@ -27,10 +27,7 @@ pre {
 }
 
 /* customizing bootstrap nav bar */
-.navbar {
-    margin-bottom: 0px;
-    padding-right: 110px;
-}
+
 .navbar .container {
     margin: 10px;
 }

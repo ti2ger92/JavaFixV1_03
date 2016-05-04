@@ -33,6 +33,11 @@
 </head>
 
 <body>
+
+<div id="navbar">
+    <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This GitHub</a>
+</div>
+
 <h1>Java Source Cleaner</h1>
 
 <p>Welcome!  This tool will find opportunities to clean up and modernize Java code to take advantages of Java 8. &nbsp;Anything you put in here can be stored and viewed by me.

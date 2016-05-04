@@ -5,6 +5,12 @@ input, select, textarea {
 
 }
 
+#navbar {
+    margin-bottom: 0px;
+    font-size: 1.5em;
+    text-align: right;
+}
+
 h1 {
     font-size: 4em;
     margin: 0.67em 0;
