@@ -1,0 +1,3 @@
+//Suggested change from: TypedToMinimal
+//ArrayList<String> aList = new ArrayList<String>();
+ArrayList<String> aList=new ArrayList<>();

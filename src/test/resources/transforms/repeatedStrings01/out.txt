@@ -1,0 +1,7 @@
+//Suggested change from: RepeatedStrings
+String string1="a String Value"; //Added this declaration to organize Strings
+//someMethod("a String Value");
+someMethod(string1);
+//Suggested change from: RepeatedStrings
+//someOtherMethod("a String Value");
+someOtherMethod(string1);

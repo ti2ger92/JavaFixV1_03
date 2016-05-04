@@ -1,0 +1,6 @@
+//I expect this to identify as a sum, but not a counter, nor a filter.
+long fleas = 0;
+for(Dog d : dogs) {
+    long  f = d.getFleas();
+    fleas = fleas+f;
+}

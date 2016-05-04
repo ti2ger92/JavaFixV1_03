@@ -1,0 +1,16 @@
+List<Cat> kittens = motherCat.getKittens();
+//Suggested change from: Replace For Loops with Functional statements
+//A stream based operation might be more readable here.  Check out http://www.tutorialspoint.com/java8/java8_streams.htm
+for(Cat aKitten : kittens) {
+    pet(aKitten);
+}
+
+int brownCats = 0;
+//Suggested change from: Replace For Loops with Functional statements
+//A stream based operation could be used to count items matching criteria.  One example is: long count = aList.stream().filter(o->o.toString().contains("value")).count()
+for(Cat kitten : kittens) {
+    String color = kitten.getColor()
+    if("brown".equals(color)) {
+        brownCats++;
+    }
+}

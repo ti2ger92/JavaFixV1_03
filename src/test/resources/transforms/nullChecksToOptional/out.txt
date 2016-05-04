@@ -1,0 +1,10 @@
+Door frontDoor = aApartment.getFrontDoor();
+//Suggested change from: Use Optional instead of null checks
+//Consider defining this as an optional instead, then use ifPresent() or map() to do this.  See https://examples.javacodegeeks.com/core-java/util/optional/java-8-optional-example/
+if(frontDoor!=null) {
+    Knobb aKnobb = aBag.getKnobb();
+    //Suggested change from: Use Optional instead of null checks
+//Consider defining this as an optional instead, then use ifPresent() or map() to do this.  See https://examples.javacodegeeks.com/core-java/util/optional/java-8-optional-example/
+if(aKnobb != null)
+        frontDoor.addKnobb(aKnobb);
+}

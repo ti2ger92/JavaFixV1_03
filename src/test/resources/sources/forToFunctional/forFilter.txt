@@ -1,0 +1,7 @@
+//I expect to find a for loop doing a filter.
+for(Dog d : dogs) {
+    Breed b = d.getBreed();
+    if(b instanceof Poodle) {
+        d.addAccessory("Pink Bow");
+    }
+}

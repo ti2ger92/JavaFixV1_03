@@ -1,0 +1,5 @@
+someObject.someMethod();
+//aComment
+//someCommentedOutCode.invoke("the test string");
+if(someObject.someMethod("the test string")||someObject.someOtherMethod("the test string"))
+    anotherObject.someMethod();

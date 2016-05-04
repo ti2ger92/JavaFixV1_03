@@ -1,0 +1,8 @@
+//I expect this to be found as a default for loop.
+String a = "1";
+for(Dog d : dogs) {
+    lesh(d);
+    d.walk();
+    clean(d.paws);
+    unleash(d);
+}

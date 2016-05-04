@@ -1,0 +1,13 @@
+someCode();
+//aComment
+String[] aStringArray = fromSomeMethod();
+//Suggested change from: ForToEnhanced
+/*
+for(int i=0;i<aStringArray.length;i++) {
+    
+*/
+//Suggested change from: Replace For Loops with Functional statements
+//A stream based operation might be more readable here.  Check out http://www.tutorialspoint.com/java8/java8_streams.htm
+for(Object aaStringArray : aStringArray) {
+    aMethod(aStringArray[i]);
+}
