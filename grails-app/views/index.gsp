@@ -39,7 +39,7 @@
 
 <div id="navbar">
     <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This project on </a>
-    <a target="_blank" href="http://www.github.com"><asset:image class="logoSize" src="gitHub_Logo.png"></asset:image></a>
+    <a target="_blank" href="http://www.github.com"><asset:image class="logoSize" src="GitHub_Logo.png"></asset:image></a>
 </div>
 
 <h1>Java Source Cleaner</h1>
