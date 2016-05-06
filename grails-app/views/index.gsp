@@ -12,6 +12,9 @@
 
     <asset:javascript src="application.js"/>
     <asset:stylesheet  src="application.css"/>
+    <asset:javascript src="lib/codemirror.js"/>
+    <asset:stylesheet src="codemirror.css"/>
+    <asset:javascript src="mode/clike/clike.js"/>
 
     <script>
         function callAjax(){
@@ -19,10 +22,10 @@
                 url: "main/transform",
                 type:"post",
                 dataType: 'json',
-                data:{codeIn:document.getElementById('codeIn').value},
+                data:{codeIn:codeIn.getValue()},
                 success: function(data) {
                     console.log(data); //<-----this logs the data in browser's console
-                    document.getElementById('codeOutArea').innerHTML=data.resultCode;
+                    codeOut.setValue(data.resultCode);
                 },
                 error: function(xhr){
                     alert(xhr.responseText); //<----when no data alert the err msg
@@ -35,7 +38,8 @@
 <body>
 
 <div id="navbar">
-    <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This GitHub</a>
+    <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This project on </a>
+    <a target="_blank" href="http://www.github.com"><asset:image class="logoSize" src="gitHub_Logo.png"></asset:image></a>
 </div>
 
 <h1>Java Source Cleaner</h1>
@@ -57,5 +61,21 @@ Paste a code segment in the first box aand click "Clean Code".  Updated code wil
 
 <p><g:textArea cols="100" name="codeOutArea" id="codeOutArea" rows="15" wrap="soft">Updated code appears here.</g:textArea></p>
 
+
+
+<script>
+    var codeIn = CodeMirror.fromTextArea(document.getElementById("codeIn"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-java"
+    });
+
+    var codeOut = CodeMirror.fromTextArea(document.getElementById("codeOutArea"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-java",
+        viewPortMargin: Infinity
+    });
+</script>
 </body>
 </html>

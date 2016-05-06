@@ -5,6 +5,15 @@ input, select, textarea {
 
 }
 
+.CodeMirror {
+    width: 700px
+}
+
+img.logoSize{
+    width:90px; /* you can use % */
+    height: auto;
+}
+
 #navbar {
     margin-bottom: 0px;
     font-size: 1.5em;
