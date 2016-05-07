@@ -15,7 +15,6 @@
     <asset:javascript src="lib/codemirror.js"/>
     <asset:stylesheet src="codemirror.css"/>
     <asset:javascript src="mode/clike/clike.js"/>
-
     <script>
         function callAjax(){
             $.ajax({
@@ -31,6 +30,7 @@
                     alert(xhr.responseText); //<----when no data alert the err msg
                 }
             });
+            codeOut.setSize(700,25*codeIn.lineCount()+10)
         }
     </script>
 </head>
@@ -38,7 +38,7 @@
 <body>
 
 <div id="navbar">
-    <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This project on </a>
+    <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This project on</a>
     <a target="_blank" href="http://www.github.com"><asset:image class="logoSize" src="GitHub_Logo.png"></asset:image></a>
 </div>
 
@@ -51,7 +51,7 @@ Paste a code segment in the first box aand click "Clean Code".  Updated code wil
 
 <p>&nbsp;</p>
 
-<g:textArea cols="100" name="codeIn" id="codeIn" rows="15">Put your Code Here</g:textArea>
+<g:textArea name="codeIn" id="codeIn" >Put your Code Here</g:textArea>
 
 <p>&nbsp;</p>
 
@@ -59,7 +59,7 @@ Paste a code segment in the first box aand click "Clean Code".  Updated code wil
 
 <p>&nbsp;</p>
 
-<p><g:textArea cols="100" name="codeOutArea" id="codeOutArea" rows="15" wrap="soft">Updated code appears here.</g:textArea></p>
+<p><g:textArea cols="100" name="codeOutArea" id="codeOutArea" wrap="soft">Updated code appears here.</g:textArea></p>
 
 
 
@@ -67,14 +67,16 @@ Paste a code segment in the first box aand click "Clean Code".  Updated code wil
     var codeIn = CodeMirror.fromTextArea(document.getElementById("codeIn"), {
         lineNumbers: true,
         matchBrackets: true,
-        mode: "text/x-java"
+        mode: "text/x-java",
+        viewportMargin: Infinity
     });
 
     var codeOut = CodeMirror.fromTextArea(document.getElementById("codeOutArea"), {
         lineNumbers: true,
         matchBrackets: true,
         mode: "text/x-java",
-        viewPortMargin: Infinity
+        viewPortMargin: Infinity,
+        readOnly: true
     });
 </script>
 </body>

@@ -8,7 +8,7 @@ html, body {
     -webkit-overflow-scrolling: touch;
 }
 
-p, ul, pre, h1, h2, h3, h4, h5, h6, h7, h8 {
+p, ul, pre, h1, h2, h3, h4, h5, h6 {
     margin: 1em 0;
 }
 
@@ -16,7 +16,7 @@ p {
     display: block;
 }
 
-h1, h2, h3, h4, h5, h6, h7, h8 {
+h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 }
 
@@ -114,13 +114,6 @@ a.navbar-brand {
     height: 400px;
 }
 
-.svg #band {
-    background-image: url(../img/grails-cupsonly-logo-white.svg);
-}
-
-.no-svg #band {
-    background-image: url(../img/groovy-logo-white.png);
-}
 
 @media (max-width: 1010px) {
     #band {
@@ -228,13 +221,6 @@ a.navbar-brand {
 .event-logo {
     height: 180px;
     float: right;
-}
-
-@media (max-width: 1010px) {
-    .event-logo {
-        height: ;
-    }
-
 }
 
 @media (max-width: 690px) {
@@ -419,14 +405,6 @@ h6 {
     color: #db4800;
 }
 
-h7 {
-    font-weight: bold;
-    color: #245f78;
-}
-
-h8 {
-    color: #245f78;
-}
 
 #footer {
     background: #f2f2f2;
@@ -618,16 +596,6 @@ h8 {
 
 #content .colset-2-its article:after {
     clear: both
-}
-
-#content .colset-2-its article .icon {
-    display: block;
-    width: 80px;
-    height: 80px;
-    background-image: url(../img/icons-colset-2-its.png);
-    float: left;
-    margin-top: 12px;
-    margin-right: 15px
 }
 
 #content .colset-2-its article .icon.icon-1 {
