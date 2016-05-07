@@ -16,21 +16,24 @@
     <asset:stylesheet src="codemirror.css"/>
     <asset:javascript src="mode/clike/clike.js"/>
     <script>
-        function callAjax(){
+        function callAjax(aUrl,aData,target){
             $.ajax({
-                url: "main/transform",
+                url: aUrl,
                 type:"post",
                 dataType: 'json',
-                data:{codeIn:codeIn.getValue()},
+                data:aData,
                 success: function(data) {
-                    console.log(data); //<-----this logs the data in browser's console
-                    codeOut.setValue(data.resultCode);
+                    target.setValue(data.resultCode);
+                        if(target==codeIn)
+                            callAjax('main/transform',{codeIn:codeIn.getValue()},codeOut);
+                    else
+                        codeOut.setSize(700,25*codeOut.lineCount()+26);
                 },
                 error: function(xhr){
-                    alert(xhr.responseText); //<----when no data alert the err msg
+                    console.log(xhr.responseText);
                 }
             });
-            codeOut.setSize(700,25*codeIn.lineCount()+10)
+
         }
     </script>
 </head>
@@ -38,10 +41,21 @@
 <body>
 
 <div id="navbar">
-    <a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This project on</a>
-    <a target="_blank" href="http://www.github.com"><asset:image class="logoSize" src="GitHub_Logo.png"></asset:image></a>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Examples<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="callAjax('main/getTest',{path:'samples/forToFunctional01.txt'},codeIn);return false;">Functional Coding Opportunities</a></li>
+            <li><a href="#" onclick="callAjax('main/getTest',{path:'samples/stringOrganization01.txt'},codeIn);return false;">String Organization</a></li>
+            <li><a href="#" onclick="callAjax('main/getTest',{path:'samples/repeatedCode01.txt'},codeIn);return false;">Repeated Code</a></li>
+            <li><a href="#" onclick="callAjax('main/getTest',{path:'samples/typedToMinimal01.txt'},codeIn);return false;">Remove Redundant Type</a></li>
+        </ul>
+    </li>
 </div>
 
+<div id="github">
+<a target="_blank" href="https://github.com/ti2ger92/JavaFixV1_03.git">This project on</a>
+<a target="_blank" href="http://www.github.com"><asset:image class="logoSize" src="GitHub_Logo.png"></asset:image></a>
+</div>
 <h1>Java Source Cleaner</h1>
 
 <p>Welcome!  This tool will find opportunities to clean up and modernize Java code to take advantages of Java 8. &nbsp;Anything you put in here can be stored and viewed by me.
@@ -55,7 +69,7 @@ Paste a code segment in the first box aand click "Clean Code".  Updated code wil
 
 <p>&nbsp;</p>
 
-<p><input type="submit" value="Clean Code" onclick="callAjax();return false;"></p>
+<p><input type="submit" value="Clean Code" onclick="callAjax('main/transform',{codeIn:codeIn.getValue()},codeOut);return false;"></p>
 
 <p>&nbsp;</p>
 

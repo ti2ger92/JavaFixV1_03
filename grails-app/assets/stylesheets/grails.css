@@ -363,13 +363,10 @@ body, html {
     font-size: 14px;
 }
 
-a {
-    color: #db4800;
-    text-decoration: underline;
-}
+
 
 a:hover {
-    color: #db4800;
+    color: #db2ed8;
     text-decoration: none
 }
 
