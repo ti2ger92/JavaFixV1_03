@@ -48,6 +48,13 @@ class CodeTransformTest extends GroovyTestCase {
         testTransform(transformFolder);
     }
 
+    @Test
+    public void testSpeed() {
+        String largeSource01 = getTextFromResource("sources/largeFiles/largeFile01.txt");
+        CodeTransform aT = new CodeTransform(largeSource01);
+        String transformed = aT.getTransformed();
+    }
+
     public void testTransform(File aFolder) {
         String codeIn = getTextFromFile(aFolder.getAbsolutePath(), "in.txt");
         String codeOut = getTextFromFile(aFolder.absolutePath, "out.txt");

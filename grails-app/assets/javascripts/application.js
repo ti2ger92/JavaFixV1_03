@@ -19,3 +19,18 @@ if (typeof jQuery !== 'undefined') {
         });
     })(jQuery);
 }
+
+function setCleaning(cleaning) {
+    if(cleaning) {
+        document.getElementById('cleanButton').style.visibility='visible';
+        document.getElementById('cleanButton').style.height=35;
+        document.getElementById('cleaning').style.visibility='hidden';
+        document.getElementById('cleaning').style.height=0;
+    } else {
+        document.getElementById('cleanButton').style.visibility='hidden';
+        document.getElementById('cleanButton').style.height=0;
+        document.getElementById('cleaning').style.visibility='visible';
+        document.getElementById('cleaning').style.height=35;
+    }
+
+}

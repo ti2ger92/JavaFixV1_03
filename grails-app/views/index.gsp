@@ -26,14 +26,17 @@
                     target.setValue(data.resultCode);
                         if(target==codeIn)
                             callAjax('main/transform',{codeIn:codeIn.getValue()},codeOut);
-                    else
-                        codeOut.setSize(700,25*codeOut.lineCount()+26);
+                    else {
+                            codeOut.setSize(700,25*codeOut.lineCount()+26);
+                            setCleaning(true);
+                        }
+
                 },
                 error: function(xhr){
                     console.log(xhr.responseText);
                 }
             });
-
+            setCleaning(false);
         }
     </script>
 </head>
@@ -42,7 +45,7 @@
 
 <div id="navbar">
     <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Examples<span class="caret"></span></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Click For Examples<span class="caret"></span></a>
         <ul class="dropdown-menu">
             <li><a href="#" onclick="callAjax('main/getTest',{path:'samples/forToFunctional01.txt'},codeIn);return false;">Functional Coding Opportunities</a></li>
             <li><a href="#" onclick="callAjax('main/getTest',{path:'samples/stringOrganization01.txt'},codeIn);return false;">String Organization</a></li>
@@ -69,7 +72,10 @@ Paste a code segment in the first box aand click "Clean Code".  Updated code wil
 
 <p>&nbsp;</p>
 
-<p><input type="submit" value="Clean Code" onclick="callAjax('main/transform',{codeIn:codeIn.getValue()},codeOut);return false;"></p>
+<p><input id="cleanButton" type="submit" value="Clean Source Code" onclick="callAjax('main/transform',{codeIn:codeIn.getValue()},codeOut);return false;"></p>
+
+<div id="cleaning" class="cleaning">Cleaning <img src="/assets/spinner.gif" ></div >
+
 
 <p>&nbsp;</p>
 

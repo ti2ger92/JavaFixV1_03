@@ -14,6 +14,7 @@ public class MicroLexer {
 
     public static final Pattern OLD_FOR_PATTERN = Pattern.compile("([^;]*)(for[ ]*\\(([^;\\)]*;[^;\\)]*;[^;\\)]*)\\))("+WS+"\\{"+WS+")");
     public static final Pattern LINE_END = Pattern.compile(WS+"[{};]"+ WS);
+    public static final Pattern ONE_LINE_COMMENT =  Pattern.compile("//[\\s\\S]*?\\n|/\\*[\\s\\S]*?\\*/");
 
 
 
@@ -52,9 +53,8 @@ public class MicroLexer {
     }
 
     public void consumeComments(CodeBlock block) {
-        Pattern oneLineComment =  Pattern.compile("//[\\s\\S]*?\\n|/\\*[\\s\\S]*?\\*/");
         for(int i=0;i<1000;i++) {
-            Matcher m = oneLineComment.matcher(block.code);
+            Matcher m = ONE_LINE_COMMENT.matcher(block.code);
             if (m.find()) {
                 Comment aComment= new Comment();
                 aComment.loc = m.start();
