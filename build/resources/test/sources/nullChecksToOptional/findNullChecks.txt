@@ -1,0 +1,6 @@
+Door frontDoor = aApartment.getFrontDoor();
+if(frontDoor!=null) {
+    Knobb aKnobb = aBag.getKnobb();
+    if(aKnobb != null)
+        frontDoor.addKnobb(aKnobb);
+}

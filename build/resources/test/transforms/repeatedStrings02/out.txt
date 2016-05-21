@@ -1,0 +1,11 @@
+someObject.someMethod();
+//aComment
+//someCommentedOutCode.invoke("the test string");
+//Suggested change from: RepeatedStrings
+String string1="the test string"; //Added this declaration to organize Strings
+/*
+if(someObject.someMethod("the test string")||someObject.someOtherMethod("the test string"))
+    anotherObject.someMethod();
+*/
+if(someObject.someMethod(string1)||someObject.someOtherMethod(string1))
+    anotherObject.someMethod();

@@ -1,0 +1,34 @@
+public void myMethod1() {
+    //Suggested change from: RepeatedCode
+method1();
+//Suggested change from: RepeatedCode
+//Suggested change from: RepeatedCode
+String a = "test1";
+    String b = "test2";
+    ArrayList a = new ArrayList();
+}
+
+public void myMethod2() {
+    //Suggested change from: RepeatedCode
+method1();
+//Suggested change from: RepeatedCode
+//Suggested change from: RepeatedCode
+String c = "test3";
+    String d = "test4";
+    ArrayList a = new ArrayList();
+}
+
+public void myMethod3() {
+    //Suggested change from: RepeatedCode
+method1();
+//Suggested change from: RepeatedCode
+//Suggested change from: RepeatedCode
+String e = "test5";
+    String f = "test6";
+    ArrayList a = new ArrayList();
+}
+public void method1(){
+dataObject aDataModel = new dataObject();
+    aDataModel.do1Thing();
+    aDataModel.do1MoreThing();
+    }

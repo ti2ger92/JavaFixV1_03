@@ -1,0 +1,26 @@
+public void Method1() {
+    dataObject aDataModel = new dataObject();
+    aDataModel.do1Thing();
+    aDataModel.do1MoreThing();
+    String a = "test";
+    String b = "test";
+    ArrayList a = new ArrayList();
+}
+
+public void Method2() {
+    dataObject aDataModel = new dataObject();
+    aDataModel.do1Thing();
+    aDataModel.do1MoreThing();
+    String c = "test";
+    String d = "test";
+    ArrayList a = new ArrayList();
+}
+
+public void Method3() {
+    dataObject aDataModel = new dataObject();
+    aDataModel.do1Thing();
+    aDataModel.do1MoreThing();
+    String e = "test";
+    String f = "test";
+    ArrayList a = new ArrayList();
+}

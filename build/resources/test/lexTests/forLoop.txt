@@ -1,0 +1,7 @@
+String aVar = "aString";
+for(int i=0;i<max;i++) {
+    aClass.aMethod(i);
+    aClass.anotherMethod(i);
+}
+aVar = "anotherString";
+int anotherVar = 5;

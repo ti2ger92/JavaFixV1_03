@@ -1,0 +1,6 @@
+//I expect to find that this for loop is operating as a counter, and not as a filter.
+int muffins = 0;
+for(Dog d : dogs) {
+    String aName = d.getName();
+    if("Muffin".equals(aName)) c++;
+}

@@ -1,0 +1,5 @@
+//I expect this to be found as 1 list to another list.
+ArrayList<Flea> fleas = new ArrayList<>();
+for(Dog d : dogs) {
+    fleas.add(d.getFleas);
+}

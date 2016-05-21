@@ -1,0 +1,6 @@
+someCode();
+//aComment
+String[] aStringArray = fromSomeMethod();
+for(int i=0;i<aStringArray.length;i++) {
+    aMethod(aStringArray[i]);
+}

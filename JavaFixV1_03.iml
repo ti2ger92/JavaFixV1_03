@@ -4,13 +4,35 @@
     <facet type="Spring" name="Spring">
       <configuration />
     </facet>
+    <facet type="hibernate" name="Hibernate">
+      <configuration>
+        <datasource-map>
+          <unit-entry name="Gorm" />
+        </datasource-map>
+        <naming-strategy-map />
+      </configuration>
+    </facet>
     <facet type="web" name="Web Gradle : JavaFixV1_03-0.1.war">
       <configuration>
         <webroots>
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
           <root url="file://$MODULE_DIR$/build/assets" relative="/assets" />
         </webroots>
-        <sourceRoots />
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/src/java" />
+          <root url="file://$MODULE_DIR$/grails-app/controllers" />
+          <root url="file://$MODULE_DIR$/grails-app/domain" />
+          <root url="file://$MODULE_DIR$/grails-app/conf" />
+          <root url="file://$MODULE_DIR$/grails-app/services" />
+          <root url="file://$MODULE_DIR$/grails-app/taglib" />
+          <root url="file://$MODULE_DIR$/src/main/java" />
+          <root url="file://$MODULE_DIR$/src/main/resources" />
+          <root url="file://$MODULE_DIR$/src/main/groovy" />
+          <root url="file://$MODULE_DIR$/grails-app/init" />
+          <root url="file://$MODULE_DIR$/grails-app/views" />
+          <root url="file://$MODULE_DIR$/grails-app/i18n" />
+          <root url="file://$MODULE_DIR$/grails-app/utils" />
+        </sourceRoots>
       </configuration>
     </facet>
   </component>
@@ -38,9 +60,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/integrationTest/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
-      <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -241,16 +260,5 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.jetty:jetty-io:9.2.14.v20151106" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.jetty.websocket:websocket-common:9.2.12.v20150709" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.jetty.websocket:websocket-api:9.2.12.v20150709" level="project" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../JavaFixV1_02/ext_lib/guava-19.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../JavaFixV1_02/ext_lib/guava-19.0-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
   </component>
 </module>

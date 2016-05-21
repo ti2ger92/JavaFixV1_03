@@ -1,0 +1,742 @@
+package model.code;
+
+import java.util.regex.Pattern;
+
+/**
+ * Created by TY-MSI on 3/7/2016.
+ */
+public class CodeBlock {
+    public String code;
+
+    public CodeBlock(String code) {
+        if(code==null)
+            throw new NullPointerException("A CodeBlock was attempted to be created with a null code.  This is not allowed.");
+        this.code = code;
+    }
+
+    public CodeBlock getCommented() {
+        if("".equals(code)||null==code)
+            return new CodeBlock(code);
+        else if(!code.contains("\n"))
+            return new CodeBlock("//"+code+"\n");
+        else if(code.indexOf("\n")==code.length()-1)
+            return new CodeBlock("//"+code);
+        else {
+            String aStart = "/*\n";
+            String aEnd = "\n*/\n";
+            return new CodeBlock(aStart+code+aEnd);
+        }
+
+    }
+
+    public String withoutComments(int length) {
+        String oneLineComment =  "//[\\s\\S]*\n";
+        String multiLineComment = "/\\*[\\s\\S]*\\*/";
+        String searchString = code.substring(0, length);
+        String rest = code.substring(length);
+        searchString = searchString.replaceAll(oneLineComment, "");
+        searchString = searchString.replaceAll(multiLineComment, "");
+        return searchString+rest;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof  CodeBlock) {
+            if(this.code.equals(((CodeBlock) o).code))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Code Block with code: "+code;
+    }
+}
+
+
+package model.code;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
+
+/**
+ * Created by TY-MSI on 3/5/2016.
+ */
+public class Instruction {
+    public long origSeq = 0;
+    public Optional<CodeBlock> source = Optional.empty();
+    public Optional<String> endPunctuation  = Optional.empty();
+    public Optional<String> minifiedInstruction  = Optional.empty();
+    public boolean touched;
+
+
+    public Instruction() {
+
+    }
+
+    public Instruction(long origSeq, String source, String endPunctuation, String minifiedInstruction) {
+        this(origSeq, Optional.ofNullable(new CodeBlock(source)), Optional.ofNullable(endPunctuation), Optional.ofNullable(minifiedInstruction));
+    }
+
+    public Instruction(long aOrigSeq, Optional<CodeBlock> aSource, Optional<String> aEndPunctuation, Optional<String> aMinifiedInstruction) {
+        this.origSeq = aOrigSeq;
+        if(aSource!=null)
+            this.source = aSource;
+        if(aEndPunctuation!=null)
+            this.endPunctuation = aEndPunctuation;
+        if(aMinifiedInstruction!=null)
+            this.minifiedInstruction = aMinifiedInstruction;
+    }
+
+    public Instruction copyNewSeq(List<Instruction> currentList) {
+        Instruction newInst = new Instruction();
+        newInst.origSeq = MicroLexer.getMaxLine(currentList).getAsLong();
+        newInst.source = source;
+        newInst.endPunctuation = endPunctuation;
+        newInst.minifiedInstruction = minifiedInstruction;
+        newInst.touched = touched;
+        return newInst;
+    }
+
+    public static Instruction commentInstruction(String comment) {
+        CodeBlock source = new CodeBlock(comment);
+        Instruction aInst = new Instruction(0l, Optional.ofNullable(source), Optional.empty(), Optional.empty());
+        return aInst.comment();
+    }
+
+    public boolean containsText(String text) {
+        return unlex().contains(text);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Instruction) {
+            if(/*origSeq ==((Instruction) o).origSeq &&*/
+                    source.equals(((Instruction) o).source) &&
+                    endPunctuation.equals(((Instruction) o).endPunctuation) &&
+                    minifiedInstruction.equals(((Instruction) o).minifiedInstruction))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean codeEquals(Instruction o) {
+        if(equals(o)) return true;
+        return minifiedInstruction.equals(o.minifiedInstruction);
+    }
+
+    public void ensureReturn() {
+        if(touched && endPunctuation.isPresent() && !endPunctuation.get().contains("\n"))
+            endPunctuation = Optional.ofNullable(endPunctuation.get()+"\n");
+        if(!touched && source.isPresent() && !source.get().code.contains("\n"))
+            source.get().code = source.get().code+"\n";
+    }
+
+    public boolean isEmpty() {
+        if(!source.isPresent() || "".equals(source.get().code))
+            return  true;
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "An Instruction:\nsource: "+
+                source + "\nendPunctionation: "+endPunctuation +
+                "\nminifiedInstruction: "+minifiedInstruction;
+    }
+
+    public Instruction changeInstruction(Optional<String> newMinifiedInstruction) {
+        Instruction newInst = new Instruction(this.origSeq, this.source, this.endPunctuation, newMinifiedInstruction);
+        newInst.touched = true;
+        return newInst;
+    }
+
+    public boolean isComment() {
+        return unlex().startsWith("//")||unlex().startsWith("/*");
+    }
+
+    public Instruction comment() {
+        if(this.source.isPresent()) {
+            CodeBlock newSource = this.source.get().getCommented();
+            return new Instruction(this.origSeq, Optional.ofNullable(newSource), this.endPunctuation, this.minifiedInstruction);
+        }
+        return new Instruction(this.origSeq, Optional.empty(), this.endPunctuation, this.minifiedInstruction);
+    }
+
+    public String unlex() {
+        String code = "";
+        if(touched) {
+            if(minifiedInstruction.isPresent())
+                code = code + minifiedInstruction.get();
+            if(endPunctuation.isPresent())
+                code = code + endPunctuation.get();
+        } else {
+            if(source.isPresent())
+                code = code + source.get().code;
+        }
+        return code;
+    }
+}
+
+
+package model.code;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
+
+/**
+ * Created by TY-MSI on 3/7/2016.
+ */
+public class InstructionTransform {
+    public HashMap<Instruction, List<Instruction>> map = new HashMap<>();
+    public ArrayList<Instruction> addAtEnd = new ArrayList<>();
+
+    public void add1To1(Instruction  from, Instruction to) {
+        ArrayList<Instruction> toList = new ArrayList<>();
+        toList.add(to);
+        add1toMany(from, toList);
+    }
+
+    public void addManyToEnd(ArrayList<Instruction> from, ArrayList<Instruction> to) {
+        delete(from);
+        addAtEnd.addAll(to);
+    }
+
+    public void addManyTo1(List<Instruction> from, Instruction to) {
+        ArrayList<Instruction> toList = new ArrayList<>();
+        toList.add(to);
+        addManyToFirst( from, toList);
+    }
+
+    public void addManyToFirst(List<Instruction> from, List<Instruction> to) {
+        if(from.size()>0)
+            add1toMany(from.get(0), to);
+        from.remove(0);
+        delete(from);
+    }
+
+    public void add1toMany(Instruction from, List<Instruction> to) {
+        if(to==null)
+            to = new ArrayList<Instruction>();
+        map.put(from, to);
+    }
+
+    public List<Instruction> getTo(Instruction from) {
+        return map.get(from);
+    }
+
+    public void delete(List<Instruction> delList) {
+        for(Instruction aInst : delList) {
+            add1toMany(aInst, null);
+        }
+    }
+
+    public void apply(ArrayList<Instruction> instructions, String suggestion) {
+        for(int i = 0;i<instructions.size();i++) {
+            Instruction currentInstruction = instructions.get(i);
+            if(map.containsKey(currentInstruction)){
+                List<Instruction> replaceVal = map.get(currentInstruction);
+                Instruction aComment = Instruction.commentInstruction("Suggested change from: "+suggestion);
+                instructions.add(i, aComment);
+                if(replaceVal==null)
+                    instructions.remove(i+1);
+                else {
+                    instructions.addAll(i+1, replaceVal);
+                    instructions.remove(i+1+replaceVal.size());
+                }
+
+            }
+        }
+        instructions.get(instructions.size()-1).ensureReturn();
+        instructions.addAll(addAtEnd);
+    }
+}
+
+
+package model.code;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Created by TY-MSI on 3/5/2016.
+ */
+public class MicroLexer {
+
+
+    public static final String WS = "[\\s]*";
+
+    public static final Pattern OLD_FOR_PATTERN = Pattern.compile("([^;]*)(for[ ]*\\(([^;\\)]*;[^;\\)]*;[^;\\)]*)\\))("+WS+"\\{"+WS+")");
+    public static final Pattern LINE_END = Pattern.compile(WS+"[{};]"+ WS);
+
+
+
+
+    public ArrayList<Instruction> instructions = new ArrayList<>();
+    public ArrayList<Comment> comments = new ArrayList<>();
+
+    public MicroLexer(String source) {
+        lex(source);
+    }
+
+    public void lex(String source) {
+        int bailout = 10000;
+        if(source==null || source.isEmpty())
+            return;
+        CodeBlock in = new CodeBlock(source);
+        int charIndex = 0;
+        consumeComments(in);
+        for(int i=0;i<bailout && in.code!=null;i++) {
+            addComments(charIndex);
+            int curLen = in.code.length();
+            Instruction aInst = consumeInstruction(in, i);
+            if(in.code!=null)
+                charIndex+=curLen-in.code.length();
+            if(!aInst.isEmpty())
+                instructions.add(aInst);
+        }
+    }
+
+    public String unlex() {
+        String code = "";
+        for(Instruction aInst :  instructions) {
+            code = code + aInst.unlex();
+        }
+        return code;
+    }
+
+    public void consumeComments(CodeBlock block) {
+        Pattern oneLineComment =  Pattern.compile("//[\\s\\S]*?\\n|/\\*[\\s\\S]*?\\*/");
+        for(int i=0;i<1000;i++) {
+            Matcher m = oneLineComment.matcher(block.code);
+            if (m.find()) {
+                Comment aComment= new Comment();
+                aComment.loc = m.start();
+                aComment.commentString = m.group();
+                comments.add(aComment);
+                block.code = m.replaceFirst("");
+            } else break;
+        }
+    }
+
+    public void addComments(int charIndex) {
+        Iterator<Comment> commentIterator= comments.iterator();
+        while(commentIterator.hasNext()) {
+            Comment aComment = commentIterator.next();
+            if (charIndex >= aComment.loc) {
+                CodeBlock source = new CodeBlock(aComment.commentString);
+                Instruction aCommentInstruction = new Instruction(0l, Optional.ofNullable(source), Optional.empty(), Optional.empty());
+                instructions.add(aCommentInstruction);
+                commentIterator.remove();
+            }
+        }
+    }
+
+    public Instruction consumeInstruction(CodeBlock block, int order) {
+        //Check for an old for loops
+        int locSemicolon = block.code.indexOf(";");
+        Instruction aInst = new Instruction();
+        aInst.origSeq = order;
+        Matcher m = OLD_FOR_PATTERN.matcher(block.code);
+        if(m.find() && m.start()<locSemicolon) {
+            aInst.source = Optional.ofNullable(new CodeBlock(m.group(0)));
+            block.code = block.code.substring(m.end(0));
+            aInst.minifiedInstruction = Optional.ofNullable(m.group(2));
+            aInst.endPunctuation = Optional.ofNullable(m.group(4));
+        }
+        else if(locSemicolon==-1) {
+            aInst.source = Optional.ofNullable(new CodeBlock(block.code));
+            block.code = null;
+        }
+        else {
+            m = LINE_END.matcher(block.code);
+            m.find();
+            aInst.source = Optional.ofNullable(new CodeBlock(block.code.substring(0,m.end())));
+            aInst.minifiedInstruction = Optional.ofNullable(block.code.substring(0, m.start()));
+            aInst.endPunctuation = Optional.ofNullable(m.group(0));
+            block.code = block.code.substring(m.end());
+        }
+        return aInst;
+    }
+
+    public class Comment {
+        long loc;
+        String commentString;
+    }
+
+    public static OptionalLong getMaxLine(List<Instruction> instList) {
+         return instList.stream().mapToLong(i->i.origSeq).max();
+    }
+}
+
+
+package model.suggestion;
+
+import model.code.Instruction;
+import model.code.MicroLexer;
+import model.outdated.Outdated;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Created by TY-MSI on 3/7/2016.
+ */
+public class ForToEnhanced extends Suggestion1To1 {
+    String OLD_FOR_PATTERN = "([^;]*)(for[ ]*\\(([\\s\\S]*;[\\s\\S]*<[\\s]*([\\S]*)(.length|.size\\(\\))[\\s]*;[\\s\\S]*)\\))";
+    String NEW_FOR_PATTERN = "for\\(Object a$4 : $4)";
+
+
+    public ForToEnhanced(List<Instruction> instructions) {
+        super(instructions);
+    }
+
+    @Override
+    public String getSuggestionType() {
+        return "ForToEnhanced";
+    }
+
+    public boolean isLineOfInterest(Instruction aInstruction) {
+        return aInstruction.minifiedInstruction.orElse("").matches(OLD_FOR_PATTERN);
+    }
+
+    public Instruction transform(Instruction in) {
+        Optional<Instruction> newInstruction = in.minifiedInstruction.map(mi -> {
+            String newCode =  mi.replaceAll(OLD_FOR_PATTERN, NEW_FOR_PATTERN);
+            return in.changeInstruction(Optional.ofNullable(newCode));
+        });
+        return newInstruction.orElse(in);
+    }
+}
+
+package model.suggestion;
+
+import model.CodeTransform;
+import model.code.Instruction;
+import model.code.InstructionTransform;
+import model.code.MicroLexer;
+import model.outdated.Outdated;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+/**
+ * Created by TY-MSI on 3/7/2016.
+ */
+public class ForToFunctional extends SuggestionComment {
+
+    public static final int TYPE_DEFAULT=1;
+    public static final int TYPE_1LIST_TO_ANOTHER=2;
+    public static final int TYPE_COUNTER=3;
+    public static final int TYPE_FILTER=4;
+    public static final int TYPE_SUM=5;
+
+    public List<InstructionBlock> forLoops = new ArrayList<>();
+
+    public Predicate<InstructionBlock> instStartsBlock(Instruction aInst) {return ib->ib.block.get(0).equals(aInst);}
+
+    public ForToFunctional(List<Instruction> instructions) {
+        super(instructions);
+        identifyForLoops();
+    }
+
+    @Override
+    public String getSuggestionType() {
+        return "Replace For Loops with Functional statements";
+    }
+
+
+    @Override
+    public Instruction getSuggestionComment(Instruction i) {
+        Optional<InstructionBlock> loop = forLoops.stream().filter(instStartsBlock(i)).findFirst();
+        if(loop.isPresent())
+            return getForSuggestionComment(loop.get());
+        return null;
+    }
+
+    @Override
+    public boolean isLineOfInterest(Instruction aInst) {
+        return forLoops.stream().anyMatch(instStartsBlock(aInst));
+    }
+
+    public void identifyForLoops() {
+        Predicate<Instruction> forStatement = i -> !i.isComment() && i.minifiedInstruction.isPresent() && i.minifiedInstruction.get().contains("for(") &&
+                i.endPunctuation.isPresent() && i.endPunctuation.get().contains("{");
+        List<Instruction> forStatements = instructions.stream()
+                .filter(forStatement)
+                .collect(Collectors.toList());
+        Collections.reverse(forStatements);
+        forLoops = forStatements.stream().map(inst -> {
+            for(int i = instructions.lastIndexOf(inst)+1;i<instructions.size();i++) {
+                if(  instructions.get(i).containsText("}") && !instructions.get(i).isComment() ) {
+                    return InstructionBlock.create(instructions.subList(instructions.lastIndexOf(inst), i+1), 0);
+                }
+            }
+            return null;
+        }).collect(Collectors.toList());
+    }
+
+    public static Instruction getForSuggestionComment(InstructionBlock aBlock) {
+        switch(identifyForType(aBlock)) {
+            case TYPE_1LIST_TO_ANOTHER :
+                return Instruction.commentInstruction("A stream based operation could be used to create a new list from an old list.  One example is: secondList = firstList.stream().map(o -> {o.toString()}).collect(Collectors.toList());.  This will return a list of stings representing your objects.");
+            case TYPE_COUNTER :
+                return Instruction.commentInstruction("A stream based operation could be used to count items matching criteria.  One example is: long count = aList.stream().filter(o->o.toString().contains(\"value\")).count()");
+            case TYPE_SUM :
+                return Instruction.commentInstruction("A stream based operation could be used to sum items matching criteria.  One example is: long total = aList.stream().filter(o->o.toString().size()).sum()");
+            case TYPE_FILTER :
+                return Instruction.commentInstruction("A stream based operation could be used to filter your list for operations.  One example is: aList.stream().filter(o->o.equals(anObject)).forEach(o->{o.operation()});.  This will execute an operation on each item in the list, as long as it equals anObject.");
+            default :
+                return Instruction.commentInstruction("A stream based operation might be more readable here.  Check out http://www.tutorialspoint.com/java8/java8_streams.htm");
+        }
+    }
+
+    public static int identifyForType(InstructionBlock aBlock) {
+        if(aBlock.containsText(".add("))
+            return TYPE_1LIST_TO_ANOTHER;
+        if(aBlock.containsText("+1")||aBlock.containsText("++"))
+            return TYPE_COUNTER;
+        if(aBlock.containsText("+")||aBlock.containsText("+="))
+            return TYPE_SUM;
+        if(aBlock.containsText("if("))
+            return TYPE_FILTER;
+        return TYPE_DEFAULT;
+    }
+}
+
+package model.suggestion;
+
+import model.code.Instruction;
+import model.code.MicroLexer;
+import model.outdated.Outdated;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Created by TY-MSI on 3/7/2016.
+ */
+public class NullChecksToOptional extends SuggestionComment {
+
+    public static final Pattern NULL_CHECK = Pattern.compile("!="+ MicroLexer.WS+"null");
+
+    public NullChecksToOptional(List<Instruction> instructions) {
+        super(instructions);
+    }
+
+    @Override
+    public String getSuggestionType() {
+        return "Use Optional instead of null checks";
+    }
+
+
+    @Override
+    public Instruction getSuggestionComment(Instruction i) {
+        return Instruction.commentInstruction("Consider defining this as an optional instead, then use ifPresent() or map() to do this.  See https://examples.javacodegeeks.com/core-java/util/optional/java-8-optional-example/");
+    }
+
+    @Override
+    public boolean isLineOfInterest(Instruction aInst) {
+        return aInst.minifiedInstruction.filter(mi->{
+            Matcher m = NULL_CHECK.matcher(mi);
+            return m.find();
+        }).isPresent();
+    }
+}
+
+
+package model.suggestion;
+
+import model.CodeTransform;
+import model.code.Instruction;
+import model.code.InstructionTransform;
+import model.outdated.Outdated;
+
+import java.util.*;
+import java.util.function.Predicate;
+
+/**
+ * Basic strategy:
+ * Create InstructionBlocks for the code, and compare them
+ * --Start with N/2 floor block size, then decrease to BLOCK_MINIMUM
+ * ---For each size, create first block A from the top, then next block B of same size just underneath, then move block B down until block B hits the end
+ * ------then move block A 1 instruction down, and repeat.
+ */
+public class RepeatedCode extends Suggestion {
+
+    public static final int BLOCK_MINIMUM=2;
+
+    public HashSet<HashSet<InstructionBlockLocation>> blockMatches = new HashSet<>();
+
+    public RepeatedCode(List<Instruction> instructions) {
+        super(instructions);
+        populateMatches();
+    }
+
+    @Override
+    public String getSuggestionType() {
+        return "RepeatedCode";
+    }
+
+    @Override
+    public List<Outdated> getOutdateds() {
+        Iterator<HashSet<InstructionBlockLocation>> matchSetsIterator= blockMatches.iterator();
+        int methodCounter = 0;
+        ArrayList<Outdated> outdates= new ArrayList<>();
+        while(matchSetsIterator.hasNext()) {
+            methodCounter++;
+            String methodName = "method"+methodCounter;
+            Instruction methodCall = new Instruction(0l, methodName+"();\n", "();\n", methodName+"()");
+            HashSet<InstructionBlockLocation> aSet = matchSetsIterator.next();
+            Outdated aOutdated = new Outdated(getSuggestionType());
+            InstructionTransform aTransform = new InstructionTransform();
+            Iterator<InstructionBlockLocation> aSetIterator = aSet.iterator();
+            while(aSetIterator.hasNext()) {
+                InstructionBlockLocation aBlockLoc = aSetIterator.next();
+                aTransform.addManyTo1(new ArrayList<Instruction>(instructions.subList(aBlockLoc.start,aBlockLoc.end)), methodCall);
+                if(!aSetIterator.hasNext()) {
+                    aTransform.addAtEnd.add(new Instruction(0l, "public void "+methodName+"(){\n","(){\n","public void "+methodName+"()"));
+                    aTransform.addAtEnd.addAll(instructions.subList(aBlockLoc.start,aBlockLoc.end));
+                    aTransform.addAtEnd.add(new Instruction(0l,"}\n","}\n",null));
+                }
+            }
+            aOutdated.setInstructionTransform(aTransform);
+            outdates.add(aOutdated);
+        }
+        return outdates;
+    }
+
+    @Override
+    public boolean isLineOfInterest(Instruction aInst) {return false;}
+
+    public void populateMatches() {
+        for(int blockSize=instructions.size()/2;blockSize>=BLOCK_MINIMUM;blockSize--) {
+            HashSet<InstructionBlockLocation> results = compareInstruction(blockSize);
+            if(results!=null)
+                blockMatches.add(results);
+        }
+    }
+
+    public HashSet<InstructionBlockLocation> compareInstruction(int blockSize) {
+        InstructionBlockLocation startLocation = new InstructionBlockLocation(0, blockSize);
+        return compareInstructionFromRecurse(startLocation);
+    }
+
+    public HashSet<InstructionBlockLocation> compareInstructionFromRecurse(InstructionBlockLocation fromLocation) {
+        if(fromLocation==null)
+            return null;
+        HashSet<InstructionBlockLocation> currentMatches = compareInstructionFromRecurse(fromLocation.step());
+        if(!intersectionExists(currentMatches, fromLocation)) {
+            InstructionBlock fromBlock = InstructionBlock.create(instructions.subList(fromLocation.start, fromLocation.end), BLOCK_MINIMUM);
+            HashSet<InstructionBlockLocation> theseMatches = compareInstructionToRecurse(fromBlock, fromLocation.nextBlock());
+            if (theseMatches != null) {
+                if (currentMatches == null) currentMatches = new HashSet<>();
+                currentMatches.addAll(theseMatches);
+                currentMatches.add(fromLocation);
+            }
+        }
+        return currentMatches;
+    }
+
+    public HashSet<InstructionBlockLocation> compareInstructionToRecurse(InstructionBlock fromBlock, InstructionBlockLocation toLocation) {
+        if(toLocation==null || fromBlock==null)
+            return null;
+        HashSet<InstructionBlockLocation> currentMatches = compareInstructionToRecurse(fromBlock, toLocation.step());
+        if(!intersectionExists(currentMatches, toLocation)) {
+            InstructionBlock toBlock = new InstructionBlock(instructions.subList(toLocation.start, toLocation.end));
+            if (fromBlock.equals(toBlock)) {
+                if (currentMatches == null) currentMatches = new HashSet<>();
+                currentMatches.add(toLocation);
+            }
+        }
+        return currentMatches;
+    }
+
+
+    public InstructionBlockLocation getInstructionBlockLocation(int start, int end) {
+        return new InstructionBlockLocation(start, end);
+    }
+
+    public boolean intersectionExists(Set<InstructionBlockLocation> currentSet, InstructionBlockLocation aLocation) {
+        if(setContainsIntersection(currentSet, aLocation))
+            return true;
+        Iterator<HashSet<InstructionBlockLocation>> lists = blockMatches.iterator();
+        while(lists.hasNext()) {
+            HashSet<InstructionBlockLocation> list = lists.next();
+            if(setContainsIntersection(list, aLocation))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean setContainsIntersection(Set<InstructionBlockLocation> aSet, InstructionBlockLocation aLocation) {
+        if(aSet!=null) {
+            Iterator<InstructionBlockLocation> candidatesItorator= aSet.iterator();
+            while(candidatesItorator.hasNext()) {
+                InstructionBlockLocation candidate = candidatesItorator.next();
+                if(candidate.intersects(aLocation))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public class InstructionBlockLocation {
+        public int start;
+        public int end;
+
+        public InstructionBlockLocation(int aStart, int aEnd) {
+            start = aStart;
+            end = aEnd;
+        }
+
+        public InstructionBlockLocation step() {
+            if(end<instructions.size())
+                return new InstructionBlockLocation(start+1,end+1);
+            return null;
+        }
+
+        public InstructionBlockLocation nextBlock() {
+            if(end+getSize()<=instructions.size())
+                return new InstructionBlockLocation(start+getSize(), end+getSize());
+            return null;
+        }
+
+        public int getSize() {
+            return end-start;
+        }
+
+        public boolean intersects(InstructionBlockLocation other) {
+            if(other==null) return false;
+            return this.start <= other.end && other.start <= this.end;
+        }
+
+        @Override
+        public String toString() {
+            return "("+start+","+end+")";
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if(other instanceof InstructionBlockLocation) {
+                return ((InstructionBlockLocation) other).start==start && ((InstructionBlockLocation) other).end==end;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return start*31+end*17;
+        }
+    }
+
+
+
+}

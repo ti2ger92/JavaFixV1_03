@@ -5,17 +5,15 @@ input, select {
 
 }
 
-.cleaning {
+#cleaningIcon {
     margin-left:50px;
-    width: 600px;
-    border-radius: 25px;
-    text-align: center;
-    background-color: #fcfcfc;
-    border: 1px solid #cccccc;
-    font-family: "Open Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    padding: 0.2em 0.4em;
-    visibility: hidden;
-    height: 0px;
+        width: 600px;
+        border-radius: 25px;
+        text-align: center;
+        background-color: #fcfcfc;
+        border: 1px solid #cccccc;
+        font-family: "Open Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        padding: 0.2em 0.4em;
 }
 
 .CodeMirror {
